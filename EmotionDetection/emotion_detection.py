@@ -9,31 +9,40 @@ def emotion_detector(text_to_analyse):
     
     formatted_response = json.loads(response.text)
     
-    # emotions = ('anger', 'disgust', 'fear', 'joy', 'sadness')
+    if response.status_code == 200:
+        anger_score = formatted_response['emotionPredictions'][0]['emotion'].get('anger', 0)
+        disgust_score = formatted_response['emotionPredictions'][0]['emotion'].get('disgust', 0)
+        fear_score = formatted_response['emotionPredictions'][0]['emotion'].get('fear', 0)
+        joy_score = formatted_response['emotionPredictions'][0]['emotion'].get('joy', 0)
+        sadness_score = formatted_response['emotionPredictions'][0]['emotion'].get('sadness', 0)
+        
+        # Create emotions dictionary
+        emotions = {
+            'anger': anger_score,
+            'disgust': disgust_score,
+            'fear': fear_score,
+            'joy': joy_score,
+            'sadness': sadness_score
+        }
 
-    anger_score = formatted_response['emotionPredictions'][0]['emotion'].get('anger', 0)
-    disgust_score = formatted_response['emotionPredictions'][0]['emotion'].get('disgust', 0)
-    fear_score = formatted_response['emotionPredictions'][0]['emotion'].get('fear', 0)
-    joy_score = formatted_response['emotionPredictions'][0]['emotion'].get('joy', 0)
-    sadness_score = formatted_response['emotionPredictions'][0]['emotion'].get('sadness', 0)
-    
-    # Create emotions dictionary
-    emotions = {
-        'anger': anger_score,
-        'disgust': disgust_score,
-        'fear': fear_score,
-        'joy': joy_score,
-        'sadness': sadness_score
-    }
+        # Determine dominant emotion
+        dominant_emotion = max(emotions, key=emotions.get)
 
-    # Determine dominant emotion
-    dominant_emotion = max(emotions, key=emotions.get)
+        return {
+            'anger': anger_score,
+            'disgust': disgust_score,
+            'fear': fear_score,
+            'joy': joy_score,
+            'sadness': sadness_score,
+            'dominant_emotion': dominant_emotion
+        }
 
-    return {
-        'anger': anger_score,
-        'disgust': disgust_score,
-        'fear': fear_score,
-        'joy': joy_score,
-        'sadness': sadness_score,
-        'dominant_emotion': dominant_emotion
-    }
+    elif response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
